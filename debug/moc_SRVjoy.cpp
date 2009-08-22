@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SRVjoy.h'
 **
-** Created: Wed Aug 19 15:10:51 2009
+** Created: Sat Aug 22 19:19:58 2009
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,22 +23,23 @@ static const uint qt_meta_data_SRVjoy[] = {
        2,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   12, // methods
+       4,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
 
  // slots: signature, parameters, type, tag, flags
        8,    7,    7,    7, 0x08,
-      22,    7,    7,    7, 0x08,
-      37,    7,    7,    7, 0x08,
+      25,    7,    7,    7, 0x08,
+      39,    7,    7,    7, 0x08,
+      54,    7,    7,    7, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_SRVjoy[] = {
-    "SRVjoy\0\0moveForward()\0moveBackward()\0"
-    "stopMoving()\0"
+    "SRVjoy\0\0connectToRobot()\0moveForward()\0"
+    "moveBackward()\0stopMoving()\0"
 };
 
 const QMetaObject SRVjoy::staticMetaObject = {
@@ -66,12 +67,13 @@ int SRVjoy::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
         switch (_id) {
-        case 0: moveForward(); break;
-        case 1: moveBackward(); break;
-        case 2: stopMoving(); break;
+        case 0: connectToRobot(); break;
+        case 1: moveForward(); break;
+        case 2: moveBackward(); break;
+        case 3: stopMoving(); break;
         default: ;
         }
-        _id -= 3;
+        _id -= 4;
     }
     return _id;
 }

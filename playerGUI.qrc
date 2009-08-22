@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/" >
+        <file>images/buttons/forward.png</file>
+        <file>images/buttons/back.png</file>
+        <file alias="player_icon" >images/player_button_v3.png</file>
+    </qresource>
+</RCC>

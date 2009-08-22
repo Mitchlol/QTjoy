@@ -16,6 +16,11 @@
 class QLabel;
 //class QLineEdit;
 class QPushButton;
+class QToolButton;
+class QAction;
+class QHBoxLayout;
+class QVBoxLayout;
+class QGridLayout;
 
 class SRVjoy : public QWidget
 {
@@ -26,20 +31,28 @@ public:
 //signals:
 
 private slots:
+      void connectToRobot();
       void moveForward();
       void moveBackward();
       void stopMoving();
 private:
+    void createActions();
+
     QLabel *m_Label;
-    QPushButton *m_FordwardButton;
-    QPushButton *m_BackwardButton;
+    QPushButton *m_ConnectButton;
+    QToolButton *m_FordwardButton;
+    QToolButton *m_BackwardButton;
+    QHBoxLayout *layoutConnect;
+    QGridLayout *layoutJoystick;
+    QVBoxLayout *centralLayout;
 
     // Player client that represents the robot
     PlayerCc::PlayerClient    *m_pRobot;
 
     // Variables use to manipulate the robot's Position2d interface
     PlayerCc::Position2dProxy *m_pPos2dProxy;
-    double m_turnrate, m_speed;
+    bool m_bConnected;
+    double m_dTurnrate, m_dSpeed;
 };
 
 

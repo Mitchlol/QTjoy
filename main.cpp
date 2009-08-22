@@ -11,8 +11,11 @@ int main(int argc, char *argv[])
 
    QApplication a(argc, argv);
 
-   SRVjoy *joy = new SRVjoy;
-   joy->show();
+//   SRVjoy *joy = new SRVjoy;
+//   joy->show();
+
+   SRVjoy joy;
+   joy.show();
 
    return a.exec();
 }
