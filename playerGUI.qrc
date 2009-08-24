@@ -1,7 +1,14 @@
 <RCC>
     <qresource prefix="/" >
         <file>images/buttons/forward.png</file>
-        <file>images/buttons/back.png</file>
         <file alias="player_icon" >images/player_button_v3.png</file>
+        <file>images/buttons/backleft.png</file>
+        <file>images/buttons/backright.png</file>
+        <file>images/buttons/camera-photo.png</file>
+        <file>images/buttons/ccw.png</file>
+        <file>images/buttons/cw.png</file>
+        <file>images/buttons/backward.png</file>
+        <file>images/buttons/fwdleft.png</file>
+        <file>images/buttons/fwdright.png</file>
     </qresource>
 </RCC>

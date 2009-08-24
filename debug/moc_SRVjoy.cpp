@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SRVjoy.h'
 **
-** Created: Sat Aug 22 19:19:58 2009
+** Created: Mon Aug 24 11:41:26 2009
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_SRVjoy[] = {
        2,       // revision
        0,       // classname
        0,    0, // classinfo
-       4,   12, // methods
+      11,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -32,14 +32,24 @@ static const uint qt_meta_data_SRVjoy[] = {
        8,    7,    7,    7, 0x08,
       25,    7,    7,    7, 0x08,
       39,    7,    7,    7, 0x08,
-      54,    7,    7,    7, 0x08,
+      57,    7,    7,    7, 0x08,
+      76,    7,    7,    7, 0x08,
+      91,    7,    7,    7, 0x08,
+     110,    7,    7,    7, 0x08,
+     130,    7,    7,    7, 0x08,
+     141,    7,    7,    7, 0x08,
+     153,    7,    7,    7, 0x08,
+     166,    7,    7,    7, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_SRVjoy[] = {
     "SRVjoy\0\0connectToRobot()\0moveForward()\0"
-    "moveBackward()\0stopMoving()\0"
+    "moveForwardLeft()\0moveForwardRight()\0"
+    "moveBackward()\0moveBackwardLeft()\0"
+    "moveBackwardRight()\0turnLeft()\0"
+    "turnRight()\0stopMoving()\0takePictureShot()\0"
 };
 
 const QMetaObject SRVjoy::staticMetaObject = {
@@ -69,11 +79,18 @@ int SRVjoy::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         switch (_id) {
         case 0: connectToRobot(); break;
         case 1: moveForward(); break;
-        case 2: moveBackward(); break;
-        case 3: stopMoving(); break;
+        case 2: moveForwardLeft(); break;
+        case 3: moveForwardRight(); break;
+        case 4: moveBackward(); break;
+        case 5: moveBackwardLeft(); break;
+        case 6: moveBackwardRight(); break;
+        case 7: turnLeft(); break;
+        case 8: turnRight(); break;
+        case 9: stopMoving(); break;
+        case 10: takePictureShot(); break;
         default: ;
         }
-        _id -= 4;
+        _id -= 11;
     }
     return _id;
 }
