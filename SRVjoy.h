@@ -23,6 +23,17 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
 
+// Moving Status Flags:
+const char STOP    = 0;
+const char BACK_LEFT  = 1;
+const char BACK    = 2;
+const char BACK_RIGHT = 3;
+const char ROTATE_CCW = 4;
+const char ROTATE_CW = 6;
+const char FORWARD_LEFT = 8;
+const char FORWARD = 9;
+const char FORWARD_RIGHT   = 10;
+
 class SRVjoy : public QWidget
 {
     Q_OBJECT
@@ -39,8 +50,8 @@ private slots:
       void moveBackward();
       void moveBackwardLeft();
       void moveBackwardRight();
-      void turnLeft();
-      void turnRight();
+      void rotateCCW();
+      void rotateCW();
       void stopMoving();
       void setLinearSpeed(int nSpeed);
       // To be implemented:
@@ -48,7 +59,8 @@ private slots:
 
 protected:
     void keyPressEvent(QKeyEvent *event);
-
+    void keyReleaseEvent(QKeyEvent *event);
+//    bool eventFilter(QObject* obj, QEvent* event);
 private:
     void createActions();
 
@@ -74,9 +86,9 @@ private:
     // Variables to manipulate the robot's Position2d interface
     PlayerCc::Position2dProxy *m_pPos2dProxy;
     bool m_bConnected;
-    double m_dTurnRateRadians;
+//    double m_dTurnRateRadians;
     double m_dTurnRateDegrees;
-    double m_dSpeed;
+    player_pose2d m_Speed2D;
 
     // Variables to manipulate the robot's Camera interface
     PlayerCc::CameraProxy *m_pCameraProxy;
@@ -85,6 +97,8 @@ private:
     static const double m_dMaxSpeed = 0.5; // m/second
     static const double m_dMinSpeed = 0.05; // m/second
     static const double m_dMaxTurnRateDegrees = 270; // rad/second
+
+    char m_nCurrentMove;   // Current moving status of the robot
 
     void enableButtons(bool enabled);
 
@@ -96,6 +110,7 @@ private:
     void decreaseLinearSpeed();
     void reverseSpeed();
     int normalizeSliderSpeed(double dSpeed);
+    void refreshCurrentMove();
 };
 
 

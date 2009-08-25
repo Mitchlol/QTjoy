@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SRVjoy.h'
 **
-** Created: Tue Aug 25 13:36:38 2009
+** Created: Tue Aug 25 16:16:54 2009
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -37,7 +37,7 @@ static const uint qt_meta_data_SRVjoy[] = {
       91,    7,    7,    7, 0x08,
      110,    7,    7,    7, 0x08,
      130,    7,    7,    7, 0x08,
-     141,    7,    7,    7, 0x08,
+     142,    7,    7,    7, 0x08,
      153,    7,    7,    7, 0x08,
      173,  166,    7,    7, 0x08,
      193,    7,    7,    7, 0x08,
@@ -49,8 +49,8 @@ static const char qt_meta_stringdata_SRVjoy[] = {
     "SRVjoy\0\0connectToRobot()\0moveForward()\0"
     "moveForwardLeft()\0moveForwardRight()\0"
     "moveBackward()\0moveBackwardLeft()\0"
-    "moveBackwardRight()\0turnLeft()\0"
-    "turnRight()\0stopMoving()\0nSpeed\0"
+    "moveBackwardRight()\0rotateCCW()\0"
+    "rotateCW()\0stopMoving()\0nSpeed\0"
     "setLinearSpeed(int)\0takePictureShot()\0"
 };
 
@@ -86,8 +86,8 @@ int SRVjoy::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 4: moveBackward(); break;
         case 5: moveBackwardLeft(); break;
         case 6: moveBackwardRight(); break;
-        case 7: turnLeft(); break;
-        case 8: turnRight(); break;
+        case 7: rotateCCW(); break;
+        case 8: rotateCW(); break;
         case 9: stopMoving(); break;
         case 10: setLinearSpeed((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 11: takePictureShot(); break;
