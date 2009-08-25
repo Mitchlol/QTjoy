@@ -10,7 +10,7 @@
 
 #include <QWidget>
 #include <libplayerc++/playerc++.h>
-//#include "args.h"
+#include "args.h"
 
 //class QCheckBox;
 class QLabel;
@@ -69,12 +69,15 @@ private:
     // Player client that represents the robot
     PlayerCc::PlayerClient    *m_pRobot;
 
-    // Variables use to manipulate the robot's Position2d interface
+    // Variables to manipulate the robot's Position2d interface
     PlayerCc::Position2dProxy *m_pPos2dProxy;
     bool m_bConnected;
     double m_dTurnRateRadians;
     double m_dTurnRateDegrees;
     double m_dSpeed;
+
+    // Variables to manipulate the robot's Camera interface
+    PlayerCc::CameraProxy *m_pCameraProxy;
 
     // define the speed limits for the robot:
     static const double m_dMaxSpeed = 0.5; // m/second

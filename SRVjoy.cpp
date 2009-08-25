@@ -93,7 +93,6 @@ void SRVjoy::createActions()
    layoutJoystick->addWidget(m_BackwardButton, 2, 1);
    layoutJoystick->addWidget(m_BackwardRightButton, 2, 2);
 
-
    centralLayout = new QVBoxLayout;
    centralLayout->addLayout(layoutConnect);
    centralLayout->addLayout(layoutJoystick);
@@ -111,11 +110,17 @@ void SRVjoy::connectToRobot()
       {
       try
       {
-         m_pRobot = new PlayerClient("localhost");
+         // Create Robot
+//         m_pRobot = new PlayerClient("localhost");
+         m_pRobot = new PlayerClient(gHostname, gPort);
          std::cout << "\nDone Creating robot as PlayerClient\n";
-         //      PlayerClient    robot(gHostname, gPort);
+
+         // Create Position2D Proxy
          m_pPos2dProxy = new Position2dProxy(m_pRobot,0);
          m_pPos2dProxy->SetMotorEnable(true);
+
+         // Create camera proxy
+         m_pCameraProxy = new CameraProxy(m_pRobot, gIndex);
 
          // Default Speeds to begin with:
          setTurnrateInDegrees(90.0);   // Start with 90 degrees per second
@@ -143,7 +148,7 @@ void SRVjoy::connectToRobot()
          connect(m_TurnLeftButton, SIGNAL(released()),
                this, SLOT(stopMoving()));
 
-         connect(m_CameraSnapshotButton, SIGNAL(clicked()),
+         connect(m_CameraSnapshotButton, SIGNAL(released()),
                this, SLOT(takePictureShot()));
 
          connect(m_TurnRightButton, SIGNAL(pressed()),
@@ -400,6 +405,24 @@ void SRVjoy::stopMoving()
 
 void SRVjoy::takePictureShot()
 {
+   try
+    {
+      m_pRobot->Read();
+      for(int i=0; i<1; i++)
+         {
+         m_pRobot->Read(); // It is BUGGY, because for some weird reason
+                           // the previous frame appears, or doesn't get flushed
+         m_pCameraProxy->SaveFrame("camera");
+         std::cout << (*m_pCameraProxy) << std::endl;
+         printf("\nTaking Picture\n");
+         }
+    }
+   catch (PlayerCc::PlayerError e)
+    {
+       std::cerr << e << std::endl;
+       enableButtons(false);   // Disable buttons
+       return;
+    }
 
 }
 

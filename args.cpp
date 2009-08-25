@@ -1,19 +1,11 @@
-#ifndef ARGS_H_
-#define ARGS_H_
+/*
+ * args.cpp
+ *
+ *  Created on: Aug 24, 2009
+ *      Author: carlos
+ */
 
-#include <libplayerc++/playerc++.h>
-#include <iostream>
-#include <unistd.h>
-
-std::string  gHostname(PlayerCc::PLAYER_HOSTNAME);
-uint32_t        gPort(PlayerCc::PLAYER_PORTNUM);
-uint32_t        gIndex(0);
-uint32_t        gDebug(0);
-uint32_t        gFrequency(10); // Hz
-uint32_t        gDataMode(PLAYER_DATAMODE_PUSH);
-bool         gUseLaser(false);
-
-void print_usage(int argc, char** argv);
+#include "args.h"
 
 int parse_args(int argc, char** argv)
 {
@@ -83,29 +75,3 @@ void print_usage(int argc, char** argv)
   cerr << "                      PLAYER_DATAMODE_PULL = "
        << PLAYER_DATAMODE_PULL << endl;
 } // end print_usage
-
-void setDirectionUpDown(double sp_up, double sp_down, double &xSpeed)
-{
-  const double stdSpeed = 0.4;
-
-  if (sp_up <= 2.5)
-    xSpeed = -stdSpeed;
-  if (sp_down <= 2.5)
-    xSpeed = stdSpeed;
-  else
-    xSpeed = xSpeed;
-}
-
-void setDirectionLeftRight(double sp_left, double sp_right, double &ySpeed)
-{
-  const double stdSpeed = 0.4;
-
-  if (sp_left <= 2.5)
-    ySpeed = -stdSpeed;
-  if (sp_right <= 2.5)
-    ySpeed = stdSpeed;
-  else
-    ySpeed = ySpeed;
-}
-
-#endif /* ARGS_H_ */
