@@ -82,6 +82,9 @@ void SRVjoy::createActions()
    m_LinearSpeedSlider = new QSlider(Qt::Vertical);
    m_LinearSpeedSlider->setRange(abs(m_dMinSpeed*100),abs(m_dMaxSpeed*100));  // 100x scale
 
+   m_AngularSpeedSlider = new QSlider(Qt::Horizontal);
+   m_AngularSpeedSlider->setRange(0,abs(m_nMaxTurnRateDegrees)); // 1x scale
+
    // Layouts:
    layoutConnect = new QHBoxLayout;
    layoutConnect->addWidget(m_ConnectButton);
@@ -97,6 +100,7 @@ void SRVjoy::createActions()
    layoutJoystick->addWidget(m_BackwardButton, 2, 1);
    layoutJoystick->addWidget(m_BackwardRightButton, 2, 2);
    layoutJoystick->addWidget(m_LinearSpeedSlider, 0, 3, 3, 1); // spans 3 rows
+   layoutJoystick->addWidget(m_AngularSpeedSlider, 3, 0, 1, 3); // spans 3 columns
 
    centralLayout = new QVBoxLayout;
    centralLayout->addLayout(layoutConnect);
@@ -131,13 +135,17 @@ void SRVjoy::connectToRobot()
          m_Speed2D.px = 0.10;  // Start at 0.10 meters per second
 
          // Default Speeds to begin with:
-         setTurnrateInDegrees(90.0);   // Start with 90 degrees per second
-
+         setAngularSpeedInDegrees(90.0);   // Start with 90 degrees per second
 
          // Set m_LinearSpeedSlider to the current speed:
          m_LinearSpeedSlider->setValue(normalizeSliderSpeed(m_Speed2D.px));
          connect(m_LinearSpeedSlider, SIGNAL(valueChanged(int)),
                this, SLOT(setLinearSpeed(int)));
+
+         // Set m_AngularSpeedSlider to the current speed:
+         m_AngularSpeedSlider->setValue(abs(m_nTurnRateDegrees));
+         connect(m_AngularSpeedSlider, SIGNAL(valueChanged(int)),
+               this, SLOT(setAngularSpeedInDegrees(int)));
 
          // Joystick buttons Signal/Slot connections:
 
@@ -260,7 +268,7 @@ void SRVjoy::moveForwardLeft()
          reverseSpeed();
          }
 
-      if(m_dTurnRateDegrees < 0.0)   // To turn left, turn rate must be a positive value
+      if(m_nTurnRateDegrees < 0)   // To turn left, turn rate must be a positive value
          {
          reverseTurnRate();
          }
@@ -269,7 +277,7 @@ void SRVjoy::moveForwardLeft()
 
       m_nCurrentMove = FORWARD_LEFT;
 
-      printf("\nMoving Forward-Left at %f m/sec and %f deg/sec\n", m_Speed2D.px, m_dTurnRateDegrees);
+      printf("\nMoving Forward-Left at %f m/sec and %i deg/sec\n", m_Speed2D.px, m_nTurnRateDegrees);
    }
    catch (PlayerCc::PlayerError e)
    {
@@ -288,7 +296,7 @@ void SRVjoy::moveForwardRight()
          reverseSpeed();
          }
 
-      if(m_dTurnRateDegrees > 0.0)   // To turn right, turn rate must be a negative value
+      if(m_nTurnRateDegrees > 0)   // To turn right, turn rate must be a negative value
          {
          reverseTurnRate();
          }
@@ -297,7 +305,7 @@ void SRVjoy::moveForwardRight()
 
       m_nCurrentMove = FORWARD_RIGHT;
 
-      printf("\nMoving Forward-Right at %f m/sec and %f deg/sec\n", m_Speed2D.px, m_dTurnRateDegrees);
+      printf("\nMoving Forward-Right at %f m/sec and %i deg/sec\n", m_Speed2D.px, m_nTurnRateDegrees);
    }
    catch (PlayerCc::PlayerError e)
    {
@@ -311,7 +319,7 @@ void SRVjoy::rotateCCW()
 {
    try
    {
-      if(m_dTurnRateDegrees < 0.0)   // To turn left, turn rate must be a positive value
+      if(m_nTurnRateDegrees < 0)   // To turn left, turn rate must be a positive value
          {
          reverseTurnRate();
          }
@@ -320,7 +328,7 @@ void SRVjoy::rotateCCW()
 
       m_nCurrentMove = ROTATE_CCW;
 
-      printf("\nTurning Left at %f deg/sec\n", m_dTurnRateDegrees);
+      printf("\nTurning Left at %i deg/sec\n", m_nTurnRateDegrees);
    }
    catch (PlayerCc::PlayerError e)
    {
@@ -334,7 +342,7 @@ void SRVjoy::rotateCW()
 {
    try
    {
-      if(m_dTurnRateDegrees > 0.0)   // To turn right, turn rate must be a negative value
+      if(m_nTurnRateDegrees > 0)   // To turn right, turn rate must be a negative value
          {
          reverseTurnRate();
          }
@@ -343,7 +351,7 @@ void SRVjoy::rotateCW()
 
       m_nCurrentMove = ROTATE_CW;
 
-      printf("\nTurning Right at %f deg/sec\n", m_dTurnRateDegrees);
+      printf("\nTurning Right at %i deg/sec\n", m_nTurnRateDegrees);
    }
    catch (PlayerCc::PlayerError e)
    {
@@ -382,14 +390,14 @@ void SRVjoy::moveBackwardLeft()
          {
          reverseSpeed();
          }
-      if(m_dTurnRateDegrees > 0.0)   // To turn back-left, turn rate must be a negative value
+      if(m_nTurnRateDegrees > 0)   // To turn back-left, turn rate must be a negative value
          {
          reverseTurnRate();
          }
 
       m_pPos2dProxy->SetSpeed(m_Speed2D);
       m_nCurrentMove = BACK_LEFT;
-      printf("\nMoving Backward-Left at %f m/sec and %f deg/sec\n", m_Speed2D.px, m_dTurnRateDegrees);
+      printf("\nMoving Backward-Left at %f m/sec and %i deg/sec\n", m_Speed2D.px, m_nTurnRateDegrees);
    }
    catch (PlayerCc::PlayerError e)
    {
@@ -408,14 +416,14 @@ void SRVjoy::moveBackwardRight()
          reverseSpeed();
          }
 
-      if(m_dTurnRateDegrees < 0.0)   // To turn back-right, turn rate must be a positive value
+      if(m_nTurnRateDegrees < 0)   // To turn back-right, turn rate must be a positive value
          {
          reverseTurnRate();
          }
 
       m_pPos2dProxy->SetSpeed(m_Speed2D);
       m_nCurrentMove = BACK_RIGHT;
-      printf("\nMoving Backward-Right at %f m/sec and %f deg/sec\n", m_Speed2D.px, m_dTurnRateDegrees);
+      printf("\nMoving Backward-Right at %f m/sec and %i deg/sec\n", m_Speed2D.px, m_nTurnRateDegrees);
    }
    catch (PlayerCc::PlayerError e)
    {
@@ -443,6 +451,12 @@ void SRVjoy::stopMoving()
 void SRVjoy::setLinearSpeed(int nSpeed)
 {
    m_Speed2D.px = (double)(nSpeed/100.0);
+}
+
+void SRVjoy::setAngularSpeedInDegrees(int nDegrees)
+{
+   m_nTurnRateDegrees = nDegrees;
+   m_Speed2D.pa = DTOR(m_nTurnRateDegrees);
 }
 
 void SRVjoy::takePictureShot()
@@ -477,14 +491,14 @@ void SRVjoy::keyPressEvent(QKeyEvent *event)
     switch (event->key()) {
     case Qt::Key_Plus:
        if (event->modifiers() & Qt::ControlModifier) {
-          increaseTurnRate();
+          increaseAngularSpeed();
        } else {
           increaseLinearSpeed();
        }
         break;
     case Qt::Key_Minus:
        if (event->modifiers() & Qt::ControlModifier) {
-          decreaseTurnRate();
+          decreaseAngularSpeed();
        } else {
           decreaseLinearSpeed();
        }
@@ -624,49 +638,46 @@ void SRVjoy::keyReleaseEvent(QKeyEvent *event)
 
 //^^^^^^^^^^^^^^^^ FINISH Re-implemented Event Handlers ^^^^^^^^^^^^^^^^^^^^^^^
 
-void SRVjoy::setTurnrateInDegrees(double dDegrees)
+void SRVjoy::increaseAngularSpeed()
 {
-   m_dTurnRateDegrees = dDegrees;
-   m_Speed2D.pa = DTOR(m_dTurnRateDegrees);
-}
-
-void SRVjoy::increaseTurnRate()
-{
-   m_dTurnRateDegrees = fabs(m_dTurnRateDegrees);
-   if( m_dTurnRateDegrees <= m_dMaxTurnRateDegrees )
+   m_nTurnRateDegrees = abs(m_nTurnRateDegrees);
+   if( m_nTurnRateDegrees <= m_nMaxTurnRateDegrees )
       {
-      m_dTurnRateDegrees = m_dTurnRateDegrees + 30.0; // Increase Turn Rate by 30 degrees
-      setTurnrateInDegrees(m_dTurnRateDegrees);
+      setAngularSpeedInDegrees(m_nTurnRateDegrees+30);   // Increase Turn Rate by 30 degrees/sec
+      m_AngularSpeedSlider->setValue(m_nTurnRateDegrees);
       refreshCurrentMove();
       }
 }
 
-void SRVjoy::decreaseTurnRate()
+void SRVjoy::decreaseAngularSpeed()
 {
-   m_dTurnRateDegrees = fabs(m_dTurnRateDegrees);
+   m_nTurnRateDegrees = abs(m_nTurnRateDegrees);
 
-   if( m_dTurnRateDegrees >= 30 )
+   if( m_nTurnRateDegrees >= 30 )
       {
-      m_dTurnRateDegrees = m_dTurnRateDegrees - 30.0;    // Decrease Turn Rate by 30 degrees
-      setTurnrateInDegrees(m_dTurnRateDegrees);
-      refreshCurrentMove();
+      setAngularSpeedInDegrees(m_nTurnRateDegrees-30);   // Decrease Turn Rate by 30 degrees/sec
+      m_AngularSpeedSlider->setValue(m_nTurnRateDegrees);
       }
+   else{
+      setAngularSpeedInDegrees(0);   // Turn Rate has reached 0 degrees/sec
+      m_AngularSpeedSlider->setValue(m_nTurnRateDegrees);
+   }
+
+   refreshCurrentMove();
+
 }
 
 void SRVjoy::reverseTurnRate()
 {
-   m_dTurnRateDegrees = m_dTurnRateDegrees * (-1.0);
-   setTurnrateInDegrees(m_dTurnRateDegrees);
-   }
+   setAngularSpeedInDegrees(m_nTurnRateDegrees * (-1));
+}
 
 void SRVjoy::increaseLinearSpeed()
 {
    if( fabs(m_Speed2D.px) <= m_dMaxSpeed )
       {
       m_Speed2D.px = m_Speed2D.px * 1.10;    // Increase linear speed by 10%
-
       refreshCurrentMove();
-
       m_LinearSpeedSlider->setValue(normalizeSliderSpeed(m_Speed2D.px));
       }
 }
@@ -676,9 +687,7 @@ void SRVjoy::decreaseLinearSpeed()
    if( fabs(m_Speed2D.px) >= m_dMinSpeed )
       {
       m_Speed2D.px = m_Speed2D.px * 0.90;    // Decrease linear speed by 10%
-
       refreshCurrentMove();
-
       m_LinearSpeedSlider->setValue(normalizeSliderSpeed(m_Speed2D.px));
       }
 }
@@ -690,6 +699,7 @@ void SRVjoy::reverseSpeed()
 
 int SRVjoy::normalizeSliderSpeed(double dSpeed)
 {
+   printf("\nNormalized Speed is %i", abs(100*dSpeed));
    return abs(100*dSpeed);
 }
 
