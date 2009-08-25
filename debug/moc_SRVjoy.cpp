@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'SRVjoy.h'
 **
-** Created: Mon Aug 24 23:59:06 2009
+** Created: Tue Aug 25 13:36:38 2009
 **      by: The Qt Meta Object Compiler version 61 (Qt 4.5.0)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_SRVjoy[] = {
        2,       // revision
        0,       // classname
        0,    0, // classinfo
-      11,   12, // methods
+      12,   12, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -39,7 +39,8 @@ static const uint qt_meta_data_SRVjoy[] = {
      130,    7,    7,    7, 0x08,
      141,    7,    7,    7, 0x08,
      153,    7,    7,    7, 0x08,
-     166,    7,    7,    7, 0x08,
+     173,  166,    7,    7, 0x08,
+     193,    7,    7,    7, 0x08,
 
        0        // eod
 };
@@ -49,7 +50,8 @@ static const char qt_meta_stringdata_SRVjoy[] = {
     "moveForwardLeft()\0moveForwardRight()\0"
     "moveBackward()\0moveBackwardLeft()\0"
     "moveBackwardRight()\0turnLeft()\0"
-    "turnRight()\0stopMoving()\0takePictureShot()\0"
+    "turnRight()\0stopMoving()\0nSpeed\0"
+    "setLinearSpeed(int)\0takePictureShot()\0"
 };
 
 const QMetaObject SRVjoy::staticMetaObject = {
@@ -87,10 +89,11 @@ int SRVjoy::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
         case 7: turnLeft(); break;
         case 8: turnRight(); break;
         case 9: stopMoving(); break;
-        case 10: takePictureShot(); break;
+        case 10: setLinearSpeed((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 11: takePictureShot(); break;
         default: ;
         }
-        _id -= 11;
+        _id -= 12;
     }
     return _id;
 }

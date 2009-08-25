@@ -78,7 +78,11 @@ void SRVjoy::createActions()
 
    enableButtons(false);   // Start with disabled Joystick buttons
 
-      // Layouts:
+   // Speed Control Sliders
+   m_LinearSpeedSlider = new QSlider(Qt::Vertical);
+   m_LinearSpeedSlider->setRange(5, 50);  // To be use with values from 0.05 to 0.50
+
+   // Layouts:
    layoutConnect = new QHBoxLayout;
    layoutConnect->addWidget(m_ConnectButton);
 
@@ -92,6 +96,7 @@ void SRVjoy::createActions()
    layoutJoystick->addWidget(m_BackwardLeftButton, 2, 0);
    layoutJoystick->addWidget(m_BackwardButton, 2, 1);
    layoutJoystick->addWidget(m_BackwardRightButton, 2, 2);
+   layoutJoystick->addWidget(m_LinearSpeedSlider, 0, 3, 3, 1); // spans 3 rows
 
    centralLayout = new QVBoxLayout;
    centralLayout->addLayout(layoutConnect);
@@ -119,12 +124,15 @@ void SRVjoy::connectToRobot()
          m_pPos2dProxy = new Position2dProxy(m_pRobot,0);
          m_pPos2dProxy->SetMotorEnable(true);
 
-         // Create camera proxy
-         m_pCameraProxy = new CameraProxy(m_pRobot, gIndex);
-
          // Default Speeds to begin with:
          setTurnrateInDegrees(90.0);   // Start with 90 degrees per second
          m_dSpeed = 0.10;  // Start at 0.10 meters per second
+
+
+         // Set m_LinearSpeedSlider to the current speed:
+         m_LinearSpeedSlider->setValue(normalizeSliderSpeed(m_dSpeed));
+         connect(m_LinearSpeedSlider, SIGNAL(valueChanged(int)),
+               this, SLOT(setLinearSpeed(int)));
 
          // Joystick buttons Signal/Slot connections:
 
@@ -147,9 +155,6 @@ void SRVjoy::connectToRobot()
                this, SLOT(turnLeft()));
          connect(m_TurnLeftButton, SIGNAL(released()),
                this, SLOT(stopMoving()));
-
-         connect(m_CameraSnapshotButton, SIGNAL(released()),
-               this, SLOT(takePictureShot()));
 
          connect(m_TurnRightButton, SIGNAL(pressed()),
                this, SLOT(turnRight()));
@@ -182,7 +187,23 @@ void SRVjoy::connectToRobot()
          enableButtons(false);   // Disable buttons
          return;
       }
-  }
+/*// COMMENT this try/catch block when NOT Using CAMERA interface:
+      try        // to create camera proxy
+      {
+         // Read configuration file if camera interface is provided:
+               // MISSING implementation
+         m_pCameraProxy = new CameraProxy(m_pRobot, gIndex);
+         connect(m_CameraSnapshotButton, SIGNAL(released()),
+               this, SLOT(takePictureShot()));
+      }
+      catch (PlayerCc::PlayerError e)
+      {
+         std::cerr << e << std::endl;
+         m_CameraSnapshotButton->setEnabled(false);   // Disable camera button(s)
+         return;
+      }
+*/
+   }
 }
 
 void SRVjoy::enableButtons(bool enabled)
@@ -403,6 +424,11 @@ void SRVjoy::stopMoving()
    }
 }
 
+void SRVjoy::setLinearSpeed(int nSpeed)
+{
+   m_dSpeed = (double)(nSpeed/100.0);
+}
+
 void SRVjoy::takePictureShot()
 {
    try
@@ -433,41 +459,85 @@ void SRVjoy::keyPressEvent(QKeyEvent *event)
    // +/- : increase/decrease only linear speed by 10%
     switch (event->key()) {
     case Qt::Key_Plus:
-        increaseLinearSpeed();
+       if (event->modifiers() & Qt::ControlModifier) {
+          increaseTurnRate();
+       } else {
+          increaseLinearSpeed();
+       }
         break;
     case Qt::Key_Minus:
-       decreaseLinearSpeed();
+       if (event->modifiers() & Qt::ControlModifier) {
+          decreaseTurnRate();
+       } else {
+          decreaseLinearSpeed();
+       }
         break;
-    // TEST
-//    case (Qt::Key_Control && Qt::Key_Plus):
-    case Qt::Key_A:
-       increaseTurnRate();
-       printf("\nFUCK is up\n");
+    case Qt::Key_Control:
+       // Just make this an empty case to avoid Stopping when the "Ctrl" key is pressed
        break;
-//    case Qt::Key_Left:
-//        zoomStack[curZoom].scroll(-1, 0);
-//        refreshPixmap();
-//        break;
-//    case Qt::Key_Right:
-//        zoomStack[curZoom].scroll(+1, 0);
-//        refreshPixmap();
-//        break;
-//    case Qt::Key_Down:
-//        zoomStack[curZoom].scroll(0, -1);
-//        refreshPixmap();
-//        break;
-//    case Qt::Key_Up:
-//        zoomStack[curZoom].scroll(0, +1);
-//        refreshPixmap();
-//        break;
+    case Qt::Key_1:
+       moveBackwardLeft();
+        break;
+    case Qt::Key_2:
+       moveBackward();
+       break;
+    case Qt::Key_3:
+       moveBackwardRight();
+        break;
+    case Qt::Key_4:
+       turnLeft();
+        break;
+    case Qt::Key_5:
+       takePictureShot();
+        break;
+    case Qt::Key_6:
+       turnRight();
+        break;
+    case Qt::Key_7:
+       moveForwardLeft();
+        break;
+    case Qt::Key_8:
+       moveForward();
+        break;
+    case Qt::Key_9:
+       moveForwardRight();
+        break;
+    case Qt::Key_M:
+       moveBackwardLeft();
+        break;
+    case Qt::Key_Comma:
+       moveBackward();
+       break;
+    case Qt::Key_Period:
+       moveBackwardRight();
+        break;
+    case Qt::Key_J:
+       turnLeft();
+        break;
+    case Qt::Key_K:
+       takePictureShot();
+        break;
+    case Qt::Key_L:
+       turnRight();
+        break;
+    case Qt::Key_U:
+       moveForwardLeft();
+        break;
+    case Qt::Key_I:
+       moveForward();
+        break;
+    case Qt::Key_O:
+       moveForwardRight();
+        break;
     default:
+        stopMoving();
         QWidget::keyPressEvent(event);
     }
 }
 
-void SRVjoy::setTurnrateInDegrees(double degrees)
+void SRVjoy::setTurnrateInDegrees(double dDegrees)
 {
-   m_dTurnRateDegrees = degrees;
+   m_dTurnRateDegrees = dDegrees;
    m_dTurnRateRadians = DTOR(m_dTurnRateDegrees);
 }
 
@@ -503,6 +573,8 @@ void SRVjoy::increaseLinearSpeed()
    if( fabs(m_dSpeed) <= m_dMaxSpeed )
       {
       m_dSpeed = m_dSpeed * 1.10;    // Increase linear speed by 10%
+
+      m_LinearSpeedSlider->setValue(normalizeSliderSpeed(m_dSpeed));
       }
 }
 
@@ -511,11 +583,18 @@ void SRVjoy::decreaseLinearSpeed()
    if( fabs(m_dSpeed) >= m_dMinSpeed )
       {
       m_dSpeed = m_dSpeed * 0.90;    // Decrease linear speed by 10%
+
+      m_LinearSpeedSlider->setValue(normalizeSliderSpeed(m_dSpeed));
       }
 }
 
 void SRVjoy::reverseSpeed()
 {
    m_dSpeed = m_dSpeed * (-1.0);
+}
+
+int SRVjoy::normalizeSliderSpeed(double dSpeed)
+{
+   return abs(100*dSpeed);
 }
 

@@ -17,6 +17,7 @@ class QLabel;
 //class QLineEdit;
 class QPushButton;
 class QToolButton;
+class QSlider;
 class QAction;
 class QHBoxLayout;
 class QVBoxLayout;
@@ -41,7 +42,7 @@ private slots:
       void turnLeft();
       void turnRight();
       void stopMoving();
-
+      void setLinearSpeed(int nSpeed);
       // To be implemented:
       void takePictureShot();
 
@@ -62,6 +63,7 @@ private:
     QToolButton *m_BackwardRightButton;
     QToolButton *m_BackwardButton;
     QToolButton *m_CameraSnapshotButton;
+    QSlider *m_LinearSpeedSlider;
     QHBoxLayout *layoutConnect;
     QGridLayout *layoutJoystick;
     QVBoxLayout *centralLayout;
@@ -86,13 +88,14 @@ private:
 
     void enableButtons(bool enabled);
 
-    void setTurnrateInDegrees(double degrees);
+    void setTurnrateInDegrees(double dDegrees);
     void increaseTurnRate();
     void decreaseTurnRate();
     void reverseTurnRate();
     void increaseLinearSpeed();
     void decreaseLinearSpeed();
     void reverseSpeed();
+    int normalizeSliderSpeed(double dSpeed);
 };
 
 
