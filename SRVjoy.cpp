@@ -42,39 +42,54 @@ void SRVjoy::createActions()
    connect(m_ConnectButton, SIGNAL(pressed()),
            this, SLOT(connectToRobot()));
 
-   m_Label = new QLabel(tr("Linear &Speed:"));
+//   m_LinearSpeedLabel = new QLabel(tr("Linear &Speed:"));
+   m_LinearSpeedLabel = new QLabel(tr("L\ni\nn\ne\na\nr\n\nS\np\ne\ne\nd"));
+   m_LinearSpeedLabel->setAlignment(Qt::AlignCenter);
+   m_AngularSpeedLabel = new QLabel(tr("Angular Speed"));
+   m_AngularSpeedLabel->setAlignment(Qt::AlignCenter);
+
 //    lineEdit = new QLineEdit;
 //    label->setBuddy(lineEdit);
 
    // Initialize Control Buttons:
+   int nIconSquareSize = 48;  // pixels
 
    m_ForwardLeftButton = new QToolButton(this);
 //   m_ForwardLeftButton->adjustSize();
    m_ForwardLeftButton->setIcon(QIcon(":/images/buttons/fwdleft.png"));
+   m_ForwardLeftButton->setIconSize(QSize(nIconSquareSize,nIconSquareSize));
 
    m_ForwardButton = new QToolButton(this);
    m_ForwardButton->setIcon(QIcon(":/images/buttons/forward.png"));
+   m_ForwardButton->setIconSize(QSize(nIconSquareSize,nIconSquareSize));
 
    m_ForwardRightButton = new QToolButton(this);
    m_ForwardRightButton->setIcon(QIcon(":/images/buttons/fwdright.png"));
+   m_ForwardRightButton->setIconSize(QSize(nIconSquareSize,nIconSquareSize));
 
    m_TurnLeftButton = new QToolButton(this);
    m_TurnLeftButton->setIcon(QIcon(":/images/buttons/ccw.png"));
+   m_TurnLeftButton->setIconSize(QSize(nIconSquareSize,nIconSquareSize));
 
    m_CameraSnapshotButton = new QToolButton(this);
    m_CameraSnapshotButton->setIcon(QIcon(":/images/buttons/camera-photo.png"));
+   m_CameraSnapshotButton->setIconSize(QSize(nIconSquareSize,nIconSquareSize));
 
    m_TurnRightButton = new QToolButton(this);
    m_TurnRightButton->setIcon(QIcon(":/images/buttons/cw.png"));
+   m_TurnRightButton->setIconSize(QSize(nIconSquareSize,nIconSquareSize));
 
    m_BackwardLeftButton = new QToolButton(this);
    m_BackwardLeftButton->setIcon(QIcon(":/images/buttons/backleft.png"));
+   m_BackwardLeftButton->setIconSize(QSize(nIconSquareSize,nIconSquareSize));
 
    m_BackwardButton = new QToolButton(this);
    m_BackwardButton->setIcon(QIcon(":/images/buttons/backward.png"));
+   m_BackwardButton->setIconSize(QSize(nIconSquareSize,nIconSquareSize));
 
    m_BackwardRightButton = new QToolButton(this);
    m_BackwardRightButton->setIcon(QIcon(":/images/buttons/backright.png"));
+   m_BackwardRightButton->setIconSize(QSize(nIconSquareSize,nIconSquareSize));
 
    enableButtons(false);   // Start with disabled Joystick buttons
 
@@ -90,6 +105,7 @@ void SRVjoy::createActions()
    layoutConnect->addWidget(m_ConnectButton);
 
    layoutJoystick = new QGridLayout;
+   layoutJoystick->setSpacing(0);
    layoutJoystick->addWidget(m_ForwardLeftButton, 0, 0);
    layoutJoystick->addWidget(m_ForwardButton, 0, 1);
    layoutJoystick->addWidget(m_ForwardRightButton, 0, 2);
@@ -101,6 +117,8 @@ void SRVjoy::createActions()
    layoutJoystick->addWidget(m_BackwardRightButton, 2, 2);
    layoutJoystick->addWidget(m_LinearSpeedSlider, 0, 3, 3, 1); // spans 3 rows
    layoutJoystick->addWidget(m_AngularSpeedSlider, 3, 0, 1, 3); // spans 3 columns
+   layoutJoystick->addWidget(m_LinearSpeedLabel, 0, 4, 3, 1); // spans 3 rows
+   layoutJoystick->addWidget(m_AngularSpeedLabel, 4, 0, 1, 3); // spans 3 columns
 
    centralLayout = new QVBoxLayout;
    centralLayout->addLayout(layoutConnect);
@@ -108,7 +126,7 @@ void SRVjoy::createActions()
    centralLayout->setStretchFactor(layoutJoystick,2);
     setLayout(centralLayout);
 
-    setWindowTitle(tr("Surveyor GUI (Player/Stage)"));
+    setWindowTitle(tr("SRVjoy Console (Player/Stage)"));
     setFixedHeight(sizeHint().height());
     setWindowIcon(QIcon(":player_icon"));
 }
@@ -200,7 +218,7 @@ void SRVjoy::connectToRobot()
          enableButtons(false);   // Disable buttons
          return;
       }
-/*// COMMENT this try/catch block when NOT Using CAMERA interface:
+// COMMENT this try/catch block when NOT Using CAMERA interface:
       try        // to create camera proxy
       {
          // Read configuration file if camera interface is provided:
@@ -215,12 +233,14 @@ void SRVjoy::connectToRobot()
          m_CameraSnapshotButton->setEnabled(false);   // Disable camera button(s)
          return;
       }
-*/
+// finish COMMENT here
+
    }
 }
 
 void SRVjoy::enableButtons(bool enabled)
 {
+   //Buttons:
    m_ForwardLeftButton->setEnabled(enabled);
    m_ForwardButton->setEnabled(enabled);
    m_ForwardRightButton->setEnabled(enabled);
@@ -463,15 +483,16 @@ void SRVjoy::takePictureShot()
 {
    try
     {
-      m_pRobot->Read();
-      for(int i=0; i<1; i++)
-         {
-         m_pRobot->Read(); // It is BUGGY, because for some weird reason
-                           // the previous frame appears, or doesn't get flushed
+      m_pRobot->Read();  // A blocking Read
+//      m_pRobot->ReadIfWaiting(); // A nonblocking Read
+//      for(int i=0; i<1; i++)
+//         {
+//         m_pRobot->Read(); // It is BUGGY, because for some weird reason
+//                           // the previous frame appears, or doesn't get flushed
          m_pCameraProxy->SaveFrame("camera");
-         std::cout << (*m_pCameraProxy) << std::endl;
-         printf("\nTaking Picture\n");
-         }
+//         std::cout << (*m_pCameraProxy) << std::endl;
+//         printf("\nTaking Picture\n");
+//         }
     }
    catch (PlayerCc::PlayerError e)
     {

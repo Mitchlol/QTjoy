@@ -81,7 +81,8 @@ class SRVjoy : public QWidget
       void
       createActions();
 
-      QLabel *m_Label;
+      QLabel *m_LinearSpeedLabel;
+      QLabel *m_AngularSpeedLabel;
       QPushButton *m_ConnectButton;
       QToolButton *m_ForwardLeftButton;
       QToolButton *m_ForwardRightButton;
