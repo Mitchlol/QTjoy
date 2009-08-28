@@ -1,0 +1,9 @@
+qtc-gdbmacros
+.DS_Store
+*~
+*.gch
+*.o
+.player
+doc
+moc*.cpp
+qrc*.cpp
