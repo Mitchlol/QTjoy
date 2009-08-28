@@ -4,7 +4,9 @@ QT += core \
     gui
 HEADERS += args.h \
     SRVjoy.h
-SOURCES += args.cpp \
+SOURCES += SRVjoy.cpp \
+    args.cpp \
+    main.cpp \
     main.cpp \
     SRVjoy.cpp
 FORMS += 
