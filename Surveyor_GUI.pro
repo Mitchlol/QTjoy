@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = Surveyor_GUI
+TARGET = SRVjoy
 QT += core \
     gui
 HEADERS += args.h \
