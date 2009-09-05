@@ -5,8 +5,8 @@
  *
  *  SRVjoy for Player/Stage - One Hell of a Robot Server
  *
- *  Copyleft (>) 2009 -
- *      Carlos Jaramillo (ubuntuslave@gmail.com)
+ *  Copyleft (>) 2009 - Carlos Jaramillo (ubuntuslave@gmail.com)
+ *
  *  Supervised by Professor Elizabeth Sklar from Brooklyn College, CUNY
  *  Research experience funded by DREU Summer 2009
  *
@@ -96,7 +96,7 @@ class SRVjoy : public QWidget
       keyPressEvent(QKeyEvent *event);
       void
       keyReleaseEvent(QKeyEvent *event);
-      //    bool eventFilter(QObject* obj, QEvent* event);
+
    private:
       void
       createActions();
@@ -125,6 +125,7 @@ class SRVjoy : public QWidget
       // Variables to manipulate the robot's Position2d interface
       PlayerCc::Position2dProxy *m_pPos2dProxy;
       bool m_bConnected;
+      bool m_bKeyPressRepeat; // To keep track when a key press is being repeated;
       int m_nTurnRateDegrees;
       player_pose2d m_Speed2D;
 

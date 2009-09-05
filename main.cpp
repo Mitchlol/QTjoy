@@ -9,7 +9,8 @@
 
 #include "SRVjoy.h"
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 //int main(int argc, char** argv)
 {
    parse_args(argc, argv); // Parses command line arguments
@@ -18,8 +19,8 @@ int main(int argc, char *argv[])
 
    QApplication a(argc, argv);
 
-//   SRVjoy *joy = new SRVjoy;
-//   joy->show();
+   //   SRVjoy *joy = new SRVjoy;
+   //   joy->show();
 
    SRVjoy joy;
    joy.show();
