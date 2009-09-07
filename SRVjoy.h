@@ -35,7 +35,7 @@
 
 //class QCheckBox;
 class QLabel;
-//class QLineEdit;
+class QLineEdit;
 class QPushButton;
 class QToolButton;
 class QSlider;
@@ -43,6 +43,7 @@ class QAction;
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
+//class QString;
 
 // Moving Status Flags:
 const char STOP = 0;
@@ -85,9 +86,9 @@ class SRVjoy : public QWidget
       void
       stopMoving();
       void
-      setLinearSpeed(int nSpeed);
+      setLinearSpeedFromSlider(int nSpeed);
       void
-      setAngularSpeedInDegrees(int dDegrees);
+      setAngularSpeedInDegreesFromSlider(int dDegrees);
       void
       takePictureShot();
 
@@ -103,6 +104,8 @@ class SRVjoy : public QWidget
 
       QLabel *m_LinearSpeedLabel;
       QLabel *m_AngularSpeedLabel;
+      QLineEdit *m_LinearSpeedLineEdit;
+      QLineEdit *m_AngularSpeedLineEdit;
       QPushButton *m_ConnectButton;
       QToolButton *m_ForwardLeftButton;
       QToolButton *m_ForwardRightButton;
@@ -127,6 +130,8 @@ class SRVjoy : public QWidget
       bool m_bConnected;
       bool m_bKeyPressRepeat; // To keep track when a key press is being repeated;
       int m_nTurnRateDegrees;
+      QString m_strLinearSpeed;
+      QString m_strAngularSpeed;
       player_pose2d m_Speed2D;
 
       // Variables to manipulate the robot's Camera interface
@@ -157,6 +162,10 @@ class SRVjoy : public QWidget
       normalizeSliderSpeed(double dSpeed);
       void
       refreshCurrentMove();
+      void
+      updateLinearSpeedLineEdit();
+      void
+      updateAngularSpeedLineEdit();
 };
 
 #endif /* SRVJOY_H_ */

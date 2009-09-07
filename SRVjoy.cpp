@@ -58,8 +58,15 @@ SRVjoy::createActions()
    m_AngularSpeedLabel = new QLabel(tr("Angular Speed"));
    m_AngularSpeedLabel->setAlignment(Qt::AlignCenter);
 
-   //    lineEdit = new QLineEdit;
-   //    label->setBuddy(lineEdit);
+   m_LinearSpeedLineEdit = new QLineEdit;
+   m_LinearSpeedLineEdit->setFixedWidth(70);
+   m_LinearSpeedLineEdit->setAlignment(Qt::AlignRight);
+   m_LinearSpeedLineEdit->setReadOnly(true);
+
+   m_AngularSpeedLineEdit = new QLineEdit;
+   m_AngularSpeedLineEdit->setFixedWidth(90);
+   m_AngularSpeedLineEdit->setReadOnly(true);
+   m_AngularSpeedLineEdit->setAlignment(Qt::AlignRight);
 
    // Initialize Control Buttons:
    int nIconSquareSize = 48; // pixels
@@ -129,12 +136,17 @@ SRVjoy::createActions()
    layoutJoystick->addWidget(m_LinearSpeedSlider, 0, 3, 3, 1); // spans 3 rows
    layoutJoystick->addWidget(m_AngularSpeedSlider, 3, 0, 1, 3); // spans 3 columns
    layoutJoystick->addWidget(m_LinearSpeedLabel, 0, 4, 3, 1); // spans 3 rows
-   layoutJoystick->addWidget(m_AngularSpeedLabel, 4, 0, 1, 3); // spans 3 columns
+   layoutJoystick->addWidget(m_AngularSpeedLabel, 4, 0, 1, 2); // spans 3 columns
+   layoutJoystick->addWidget(m_LinearSpeedLineEdit, 3, 3, 1, 2);  // spans 2 columns
+   layoutJoystick->addWidget(m_AngularSpeedLineEdit, 4, 2, 1, 2);  // spans 2 columns
+   layoutJoystick->setColumnStretch(4,0);
 
    centralLayout = new QVBoxLayout;
    centralLayout->addLayout(layoutConnect);
    centralLayout->addLayout(layoutJoystick);
-   centralLayout->setStretchFactor(layoutJoystick, 2);
+//   centralLayout->stretch(0); // Give column 0 no stretch ability
+   centralLayout->layout()->setSizeConstraint(QLayout::SetFixedSize);
+
    setLayout(centralLayout);
 
    setWindowTitle(tr("SRVjoy Console (Player/Stage)"));
@@ -165,17 +177,20 @@ SRVjoy::connectToRobot()
                m_Speed2D.px = 0.10; // Start at 0.10 meters per second
 
                // Default Speeds to begin with:
-               setAngularSpeedInDegrees(90.0); // Start with 90 degrees per second
+               setAngularSpeedInDegreesFromSlider(90.0); // Start with 90 degrees per second
 
                // Set m_LinearSpeedSlider to the current speed:
                m_LinearSpeedSlider->setValue(normalizeSliderSpeed(m_Speed2D.px));
                connect(m_LinearSpeedSlider, SIGNAL(valueChanged(int)), this,
-                     SLOT(setLinearSpeed(int)));
+                     SLOT(setLinearSpeedFromSlider(int)));
 
                // Set m_AngularSpeedSlider to the current speed:
                m_AngularSpeedSlider->setValue(abs(m_nTurnRateDegrees));
                connect(m_AngularSpeedSlider, SIGNAL(valueChanged(int)), this,
-                     SLOT(setAngularSpeedInDegrees(int)));
+                     SLOT(setAngularSpeedInDegreesFromSlider(int)));
+
+               updateLinearSpeedLineEdit();
+               updateAngularSpeedLineEdit();
 
                // Joystick buttons Signal/Slot connections:
 
@@ -287,7 +302,6 @@ SRVjoy::moveForward()
 
          if(!m_bKeyPressRepeat)
             printf("\nMoving Forward at %f m/sec\n", m_Speed2D.px);
-
       }
    catch (PlayerCc::PlayerError e)
       {
@@ -507,16 +521,18 @@ SRVjoy::stopMoving()
 }
 
 void
-SRVjoy::setLinearSpeed(int nSpeed)
+SRVjoy::setLinearSpeedFromSlider(int nSpeed)
 {
    m_Speed2D.px = (double) (nSpeed / 100.0);
+   updateLinearSpeedLineEdit();
 }
 
 void
-SRVjoy::setAngularSpeedInDegrees(int nDegrees)
+SRVjoy::setAngularSpeedInDegreesFromSlider(int nDegrees)
 {
    m_nTurnRateDegrees = nDegrees;
    m_Speed2D.pa = DTOR(m_nTurnRateDegrees);
+   updateAngularSpeedLineEdit();
 }
 
 void
@@ -725,7 +741,7 @@ SRVjoy::increaseAngularSpeed()
    m_nTurnRateDegrees = abs(m_nTurnRateDegrees);
    if (m_nTurnRateDegrees <= m_nMaxTurnRateDegrees)
       {
-         setAngularSpeedInDegrees(m_nTurnRateDegrees + 30); // Increase Turn Rate by 30 degrees/sec
+         setAngularSpeedInDegreesFromSlider(m_nTurnRateDegrees + 30); // Increase Turn Rate by 30 degrees/sec
          m_AngularSpeedSlider->setValue(m_nTurnRateDegrees);
          refreshCurrentMove();
       }
@@ -738,12 +754,12 @@ SRVjoy::decreaseAngularSpeed()
 
    if (m_nTurnRateDegrees >= 30)
       {
-         setAngularSpeedInDegrees(m_nTurnRateDegrees - 30); // Decrease Turn Rate by 30 degrees/sec
+         setAngularSpeedInDegreesFromSlider(m_nTurnRateDegrees - 30); // Decrease Turn Rate by 30 degrees/sec
          m_AngularSpeedSlider->setValue(m_nTurnRateDegrees);
       }
    else
       {
-         setAngularSpeedInDegrees(0); // Turn Rate has reached 0 degrees/sec
+         setAngularSpeedInDegreesFromSlider(0); // Turn Rate has reached 0 degrees/sec
          m_AngularSpeedSlider->setValue(m_nTurnRateDegrees);
       }
 
@@ -754,7 +770,7 @@ SRVjoy::decreaseAngularSpeed()
 void
 SRVjoy::reverseTurnRate()
 {
-   setAngularSpeedInDegrees(m_nTurnRateDegrees * (-1));
+   setAngularSpeedInDegreesFromSlider(m_nTurnRateDegrees * (-1));
 }
 
 void
@@ -795,6 +811,9 @@ SRVjoy::normalizeSliderSpeed(double dSpeed)
 void
 SRVjoy::refreshCurrentMove()
 {
+   updateLinearSpeedLineEdit();
+   updateAngularSpeedLineEdit();
+
    switch (m_nCurrentMove)
       {
       case STOP:
@@ -829,3 +848,14 @@ SRVjoy::refreshCurrentMove()
       }
 }
 
+void
+SRVjoy::updateLinearSpeedLineEdit(){
+   m_strLinearSpeed.setNum(m_Speed2D.px, 'g', 3);
+   m_LinearSpeedLineEdit->setText(m_strLinearSpeed + " m/s");
+}
+
+void
+SRVjoy::updateAngularSpeedLineEdit(){
+   m_strAngularSpeed.setNum(m_nTurnRateDegrees);
+   m_AngularSpeedLineEdit->setText(m_strAngularSpeed + " deg/sec");
+}
