@@ -140,14 +140,11 @@
 <pathentry base-path="/opt/qtsdk-2009.01/qt/include" include="QtSql" kind="inc" path="" system="true"/>
 <pathentry base-path="/opt/qtsdk-2009.01/qt/include" include="Qt3Support" kind="inc" path="" system="true"/>
 <pathentry base-path="/opt/qtsdk-2009.01/qt/include" include="QtTest" kind="inc" path="" system="true"/>
-<pathentry include="/usr/local/include/player-2.1" kind="inc" path="" system="true"/>
+<pathentry include="/usr/local/include/player-3.0" kind="inc" path="" system="true"/>
 <pathentry include="/usr/include" kind="inc" path="" system="true"/>
 <pathentry include="/usr/local/include" kind="inc" path="" system="true"/>
-<pathentry include="/usr/include/c++/4.3/backward" kind="inc" path="" system="true"/>
-<pathentry include="/usr/include/c++/4.3/i486-linux-gnu" kind="inc" path="" system="true"/>
 <pathentry include="/usr/lib/gcc/i486-linux-gnu/4.3/include" kind="inc" path="" system="true"/>
 <pathentry include="/usr/lib/gcc/i486-linux-gnu/4.3/include-fixed" kind="inc" path="" system="true"/>
-<pathentry include="/usr/include/c++/4.3" kind="inc" path="" system="true"/>
 <pathentry kind="src" path=""/>
 <pathentry kind="out" path=""/>
 <pathentry kind="lib" library="/usr/local/lib/libplayerc++.so" path=""/>

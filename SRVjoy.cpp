@@ -166,9 +166,16 @@ SRVjoy::connectToRobot()
                m_pRobot = new PlayerClient(gHostname, gPort);
                std::cout << "\nDone Creating robot as PlayerClient\n";
 
+
                // Create Position2D Proxy
                m_pPos2dProxy = new Position2dProxy(m_pRobot, 0);
                m_pPos2dProxy->SetMotorEnable(true);
+
+
+               // WIP: Trying to obtain a list of provided interfaces
+                             std::list<playerc_device_info_t> devList = m_pRobot->GetDeviceList();
+                             int listSize = (int)(devList.size()); // want to call drivername from each playerc_device_info_t
+                             printf("\nNumber of devices: %d\n", listSize);
 
                // Setup speed values to send them to the robot.
                // speed.px is speed in the x direction
@@ -541,8 +548,15 @@ SRVjoy::takePictureShot()
    try
       {
          m_pRobot->Read(); // A blocking Read
+         sleep(10);  // iddle seconds
+//         usleep(1000);
+         m_pRobot->Read(); // Read again!
          m_pCameraProxy->SaveFrame("camera");
          std::cout << (*m_pCameraProxy) << std::endl;
+         // ATTENTION:
+//         running the Read() command won’t always
+//         update everything at the same time, so it may take several calls before some
+//         large data structures (such as a camera image) gets updated.
       }
    catch (PlayerCc::PlayerError e)
       {

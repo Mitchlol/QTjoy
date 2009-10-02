@@ -64,7 +64,8 @@ class SRVjoy : public QWidget
       SRVjoy(QWidget *parent = 0);
       //signals:
 
-   private slots:
+//   private slots:
+   private Q_SLOTS:
       void
       connectToRobot();
       void
