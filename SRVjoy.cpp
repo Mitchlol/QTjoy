@@ -110,6 +110,7 @@ SRVjoy::createActions()
 
    enableButtons(false); // Start with disabled Joystick buttons
    m_bKeyPressRepeat = false; // because keyboard keys cannot be repeating at this point
+   m_bHasCamera = false;   // We don't know if the robot provides a camera yet
 
    // Speed Control Sliders
    m_LinearSpeedSlider = new QSlider(Qt::Vertical);
@@ -171,7 +172,7 @@ SRVjoy::connectToRobot()
                m_pPos2dProxy = new Position2dProxy(m_pRobot, 0);
                m_pPos2dProxy->SetMotorEnable(true);
 
-
+          // Look into the DeviceTable class
                // WIP: Trying to obtain a list of provided interfaces
                              std::list<playerc_device_info_t> devList = m_pRobot->GetDeviceList();
                              int listSize = (int)(devList.size()); // want to call drivername from each playerc_device_info_t
@@ -263,12 +264,14 @@ SRVjoy::connectToRobot()
                m_pCameraProxy = new CameraProxy(m_pRobot, gIndex);
                connect(m_CameraSnapshotButton, SIGNAL(clicked()), this,
                      SLOT(takePictureShot()));
+               m_bHasCamera = true;
             }
          catch (PlayerCc::PlayerError e)
             {
                std::cerr << e << std::endl;
                m_CameraSnapshotButton->setEnabled(false); // Disable camera button(s)
-               return;
+               m_bHasCamera = false;
+               //return;
             }
          // finish COMMENT here
 
@@ -545,24 +548,27 @@ SRVjoy::setAngularSpeedInDegreesFromSlider(int nDegrees)
 void
 SRVjoy::takePictureShot()
 {
-   try
+   if(providesCamera())
       {
-         m_pRobot->Read(); // A blocking Read
-         sleep(10);  // iddle seconds
-//         usleep(1000);
-         m_pRobot->Read(); // Read again!
-         m_pCameraProxy->SaveFrame("camera");
-         std::cout << (*m_pCameraProxy) << std::endl;
-         // ATTENTION:
-//         running the Read() command won’t always
-//         update everything at the same time, so it may take several calls before some
-//         large data structures (such as a camera image) gets updated.
-      }
-   catch (PlayerCc::PlayerError e)
-      {
-         std::cerr << e << std::endl;
-         enableButtons(false); // Disable buttons
-         return;
+         try
+         {
+            m_pRobot->Read(); // A blocking Read
+//            sleep(1); // 1 iddle seconds so new info can get in!
+            //         usleep(1000);
+            m_pRobot->Read(); // Read again!
+            m_pCameraProxy->SaveFrame("camera");
+            std::cout << (*m_pCameraProxy) << std::endl;
+            // ATTENTION:
+            //         running the Read() command won’t always
+            //         update everything at the same time, so it may take several calls before some
+            //         large data structures (such as a camera image) gets updated.
+         }
+         catch (PlayerCc::PlayerError e)
+         {
+            std::cerr << e << std::endl;
+            m_CameraSnapshotButton->setEnabled(false); // Disable camera button(s)
+//            return;
+         }
       }
 
 }

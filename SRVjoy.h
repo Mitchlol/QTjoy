@@ -62,7 +62,10 @@ class SRVjoy : public QWidget
 
    public:
       SRVjoy(QWidget *parent = 0);
-      //signals:
+
+      bool providesCamera(){return m_bHasCamera;};
+
+   //signals:
 
 //   private slots:
    private Q_SLOTS:
@@ -129,6 +132,7 @@ class SRVjoy : public QWidget
       // Variables to manipulate the robot's Position2d interface
       PlayerCc::Position2dProxy *m_pPos2dProxy;
       bool m_bConnected;
+      bool m_bHasCamera;
       bool m_bKeyPressRepeat; // To keep track when a key press is being repeated;
       int m_nTurnRateDegrees;
       QString m_strLinearSpeed;
