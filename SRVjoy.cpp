@@ -55,7 +55,7 @@ SRVjoy::createActions()
    //   m_LinearSpeedLabel = new QLabel(tr("Linear &Speed:"));
    m_LinearSpeedLabel = new QLabel(tr("L\ni\nn\ne\na\nr\n\nS\np\ne\ne\nd"));
    m_LinearSpeedLabel->setAlignment(Qt::AlignCenter);
-   m_AngularSpeedLabel = new QLabel(tr("Angular Speed"));
+   m_AngularSpeedLabel = new QLabel(tr("A\nn\ng\nu\nl\na\nr\n \nS\np\ne\ne\nd"));
    m_AngularSpeedLabel->setAlignment(Qt::AlignCenter);
 
    m_LinearSpeedLineEdit = new QLineEdit;
@@ -64,9 +64,9 @@ SRVjoy::createActions()
    m_LinearSpeedLineEdit->setReadOnly(true);
 
    m_AngularSpeedLineEdit = new QLineEdit;
-   m_AngularSpeedLineEdit->setFixedWidth(90);
-   m_AngularSpeedLineEdit->setReadOnly(true);
+   m_AngularSpeedLineEdit->setFixedWidth(70);
    m_AngularSpeedLineEdit->setAlignment(Qt::AlignRight);
+   m_AngularSpeedLineEdit->setReadOnly(true);
 
    // Initialize Control Buttons:
    int nIconSquareSize = 48; // pixels
@@ -116,12 +116,22 @@ SRVjoy::createActions()
    m_LinearSpeedSlider = new QSlider(Qt::Vertical);
    m_LinearSpeedSlider->setRange(abs(m_dMinSpeed * 100), abs(m_dMaxSpeed * 100)); // 100x scale
 
-   m_AngularSpeedSlider = new QSlider(Qt::Horizontal);
+   m_AngularSpeedSlider = new QSlider(Qt::Vertical);
    m_AngularSpeedSlider->setRange(0, abs(m_nMaxTurnRateDegrees)); // 1x scale
+
+   //QLabel that holds the picture
+   m_PictureDisplayLabel = new QLabel();
+   m_PictureDisplayLabel->setAlignment(Qt::AlignCenter);
+
+   //QCheckBox for save Pictures
+   m_PictureSaveCheckBox = new QCheckBox("Save Images?", this);
 
    // Layouts:
    layoutConnect = new QHBoxLayout;
    layoutConnect->addWidget(m_ConnectButton);
+
+   layoutImageDisplay = new QHBoxLayout;
+   layoutImageDisplay->addWidget(m_PictureDisplayLabel);
 
    layoutJoystick = new QGridLayout;
    layoutJoystick->setSpacing(0);
@@ -134,17 +144,24 @@ SRVjoy::createActions()
    layoutJoystick->addWidget(m_BackwardLeftButton, 2, 0);
    layoutJoystick->addWidget(m_BackwardButton, 2, 1);
    layoutJoystick->addWidget(m_BackwardRightButton, 2, 2);
-   layoutJoystick->addWidget(m_LinearSpeedSlider, 0, 3, 3, 1); // spans 3 rows
-   layoutJoystick->addWidget(m_AngularSpeedSlider, 3, 0, 1, 3); // spans 3 columns
-   layoutJoystick->addWidget(m_LinearSpeedLabel, 0, 4, 3, 1); // spans 3 rows
-   layoutJoystick->addWidget(m_AngularSpeedLabel, 4, 0, 1, 2); // spans 3 columns
+   //this image option is below the button grid
+   layoutJoystick->addWidget(m_PictureSaveCheckBox, 3, 0, 1, 2);// spans 2 columns
+   //these are listed in left to right order
+   layoutJoystick->addWidget(m_LinearSpeedLabel, 0, 3, 3, 1); // spans 3 rows
+   layoutJoystick->addWidget(m_LinearSpeedSlider, 0, 4, 3, 1); // spans 3 rows
+   layoutJoystick->addWidget(new QLabel,0,5,4,1); // spans 4 rows as a divider
+   layoutJoystick->addWidget(m_AngularSpeedLabel, 0, 6, 3, 1); // spans 3 rows
+   layoutJoystick->addWidget(m_AngularSpeedSlider, 0, 7, 3, 1); // spans 3 rows
+   //these are below the above using the same divider
    layoutJoystick->addWidget(m_LinearSpeedLineEdit, 3, 3, 1, 2);  // spans 2 columns
-   layoutJoystick->addWidget(m_AngularSpeedLineEdit, 4, 2, 1, 2);  // spans 2 columns
+   layoutJoystick->addWidget(m_AngularSpeedLineEdit, 3, 6, 1, 2);  // spans 2 columns
+
    layoutJoystick->setColumnStretch(4,0);
 
    centralLayout = new QVBoxLayout;
    centralLayout->addLayout(layoutConnect);
    centralLayout->addLayout(layoutJoystick);
+   centralLayout->addLayout(layoutImageDisplay);
 //   centralLayout->stretch(0); // Give column 0 no stretch ability
    centralLayout->layout()->setSizeConstraint(QLayout::SetFixedSize);
 
@@ -263,8 +280,9 @@ SRVjoy::connectToRobot()
 
                m_pCameraProxy = new CameraProxy(m_pRobot, gIndex);
                connect(m_CameraSnapshotButton, SIGNAL(clicked()), this,
-                     SLOT(takePictureShot()));
+                     SLOT(savePlayerPictureShot()));
                m_bHasCamera = true;
+               picnum = -1;
             }
          catch (PlayerCc::PlayerError e)
             {
@@ -546,22 +564,27 @@ SRVjoy::setAngularSpeedInDegreesFromSlider(int nDegrees)
 }
 
 void
-SRVjoy::takePictureShot()
+SRVjoy::savePlayerPictureShot()
 {
    if(providesCamera())
       {
          try
          {
+             // ATTENTION:
+             //         running the Read() command won’t always
+             //         update everything at the same time, so it may take several calls before some
+             //         large data structures (such as a camera image) gets updated.
             m_pRobot->Read(); // A blocking Read
-//            sleep(1); // 1 iddle seconds so new info can get in!
+            //sleep(1); // 1 iddle seconds so new info can get in!
             //         usleep(1000);
             m_pRobot->Read(); // Read again!
-            m_pCameraProxy->SaveFrame("camera");
+            m_pCameraProxy->SaveFrame("camera",0);
+            //playerc_camera_save(*m_pCameraProxy, "test");
             std::cout << (*m_pCameraProxy) << std::endl;
-            // ATTENTION:
-            //         running the Read() command won’t always
-            //         update everything at the same time, so it may take several calls before some
-            //         large data structures (such as a camera image) gets updated.
+            picnum++;
+            //done reading picture
+            savedPictureShotHandler();
+
          }
          catch (PlayerCc::PlayerError e)
          {
@@ -571,6 +594,41 @@ SRVjoy::takePictureShot()
          }
       }
 
+}
+
+//public class that calls picture classes (for use by thread)
+//void
+//SRVjoy::callSavePlayerPictureShot(){
+//	savePlayerPictureShot();
+//}
+
+void
+SRVjoy::savedPictureShotHandler()
+{
+	//rename image extension from jpg to pnm so it can be loaded by pixmap
+	//player saves all compressed images as jpg and uncmpressed as ppm
+	//there ahould be a way to get qpixmap->load to specify type as pnm but i cant figure it out
+	//remove # to simplify
+
+	//get name of current image, and image name we want
+	char imageName[20];
+	sprintf(imageName, "camera%d.jpg", picnum);
+	char newImageName[] ="camera.pnm";
+	//rename current picture
+	rename(imageName , newImageName);
+	//display renamed picture
+	m_PicturePixmap = new QPixmap;
+	if(m_PicturePixmap->load(newImageName)){
+		m_PictureDisplayLabel->setPixmap(*m_PicturePixmap);
+	}
+	//if pictures are supposed to be saved then rename the picture back to its original name
+	//else delete the picture
+	//this wont mess up the QLabel
+	if(m_PictureSaveCheckBox->isChecked()){
+		rename(newImageName, imageName);
+	}else{
+		remove(newImageName);
+	}
 }
 
 //^^^^^^^^^^^^^^^^^^^ finish SLOTs ^^^^^^^^^^^^^^^^^^^^^^^
@@ -647,7 +705,7 @@ SRVjoy::keyPressEvent(QKeyEvent *event)
          rotateCCW();
          break;
       case Qt::Key_5:
-         takePictureShot();
+    	  savePlayerPictureShot();
          break;
       case Qt::Key_6:
          rotateCW();
@@ -674,7 +732,7 @@ SRVjoy::keyPressEvent(QKeyEvent *event)
          rotateCCW();
          break;
       case Qt::Key_K:
-         takePictureShot();
+    	  savePlayerPictureShot();
          break;
       case Qt::Key_L:
          rotateCW();
