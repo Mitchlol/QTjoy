@@ -155,6 +155,7 @@ SRVjoy::createActions()
    setWindowIcon(QIcon(":player_icon"));
 }
 
+
 void
 SRVjoy::connectToRobot()
 {
@@ -167,7 +168,24 @@ SRVjoy::connectToRobot()
                m_pRobot = new PlayerClient(gHostname, gPort);
                std::cout << "\nDone Creating robot as PlayerClient\n";
 
+//               //TEST Camera only:
+//               m_pRobot->ReadIfWaiting(); // A nonblocking Read
+//               m_pCameraProxy = new CameraProxy(m_pRobot, gIndex);
+//               connect(m_CameraSnapshotButton, SIGNAL(clicked()), this,
+//                     SLOT(takePictureShot()));
+//               m_CameraSnapshotButton->setEnabled(true); // Enable camera button(s)
+//               m_bHasCamera = true;
 
+            }
+         catch (PlayerCc::PlayerError e)
+            {
+               std::cerr << e << std::endl;
+               enableButtons(false); // Disable buttons
+               return;
+            }
+
+        try // Create position2D proxy
+            {
                // Create Position2D Proxy
                m_pPos2dProxy = new Position2dProxy(m_pRobot, 0);
                m_pPos2dProxy->SetMotorEnable(true);
@@ -252,8 +270,9 @@ SRVjoy::connectToRobot()
             {
                std::cerr << e << std::endl;
                enableButtons(false); // Disable buttons
-               return;
+//               return;
             }
+
          // COMMENT this try/catch block when NOT Using CAMERA interface:
          try // to create camera proxy
             {
@@ -265,6 +284,8 @@ SRVjoy::connectToRobot()
                connect(m_CameraSnapshotButton, SIGNAL(clicked()), this,
                      SLOT(takePictureShot()));
                m_bHasCamera = true;
+               m_CameraSnapshotButton->setEnabled(true); // Enable camera button(s)
+
             }
          catch (PlayerCc::PlayerError e)
             {
@@ -274,6 +295,7 @@ SRVjoy::connectToRobot()
                //return;
             }
          // finish COMMENT here
+
 
       }
 }
