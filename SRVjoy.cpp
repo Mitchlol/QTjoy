@@ -159,9 +159,9 @@ SRVjoy::createActions()
    layoutJoystick->setColumnStretch(4,0);
 
    centralLayout = new QVBoxLayout;
+   centralLayout->addLayout(layoutImageDisplay);
    centralLayout->addLayout(layoutConnect);
    centralLayout->addLayout(layoutJoystick);
-   centralLayout->addLayout(layoutImageDisplay);
 //   centralLayout->stretch(0); // Give column 0 no stretch ability
    centralLayout->layout()->setSizeConstraint(QLayout::SetFixedSize);
 

@@ -4,13 +4,13 @@ QT += core \
     gui
 HEADERS += args.h \
     SRVjoy.h
-SOURCES += ImageThread.cpp \
-    SRVjoy.cpp \
+SOURCES += SRVjoy.cpp \
     args.cpp \
     main.cpp
 FORMS += 
 RESOURCES += playerGUI.qrc
-INCLUDEPATH += /usr/local/include/player-2.1/
+INCLUDEPATH += /usr/local/include/player-2.1/ \
+    /usr/local/include/player-3.0/
 LIBS += -L/usr/local/lib \
     -lplayerc++
 CONFIG += no_keywords
