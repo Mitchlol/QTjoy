@@ -126,6 +126,19 @@ SRVjoy::createActions()
    //QCheckBox for save Pictures
    m_PictureSaveCheckBox = new QCheckBox("Save Images?", this);
 
+   //QCheckBox for auto capture Pictures
+   m_EnableAutoPictureShotCheckBox = new QCheckBox("Auto Capture?", this);
+
+   //auto capture Slider
+   m_AutoPictureShotSlider = new QSlider(Qt::Horizontal);
+   m_AutoPictureShotSlider->setRange(abs(.5 * 100), abs(10 * 100)); // 10x scale
+
+   //auto capture line edit
+   m_AutoPictureShotLineEdit = new QLineEdit;
+   m_AutoPictureShotLineEdit->setFixedWidth(70);
+   m_AutoPictureShotLineEdit->setAlignment(Qt::AlignRight);
+   m_AutoPictureShotLineEdit->setReadOnly(true);
+
    // Layouts:
    layoutConnect = new QHBoxLayout;
    layoutConnect->addWidget(m_ConnectButton);
@@ -146,6 +159,10 @@ SRVjoy::createActions()
    layoutJoystick->addWidget(m_BackwardRightButton, 2, 2);
    //this image option is below the button grid
    layoutJoystick->addWidget(m_PictureSaveCheckBox, 3, 0, 1, 2);// spans 2 columns
+   //these 3 are 1 line for auto picture capture and are below image save options
+   layoutJoystick->addWidget(m_EnableAutoPictureShotCheckBox, 4, 0, 1, 2);// spans 2 columns
+   layoutJoystick->addWidget(m_AutoPictureShotSlider, 4, 2, 1, 4);// spans 4 columns
+   layoutJoystick->addWidget(m_AutoPictureShotLineEdit, 4, 6, 1, 2);// spans 2 columns
    //these are listed in left to right order
    layoutJoystick->addWidget(m_LinearSpeedLabel, 0, 3, 3, 1); // spans 3 rows
    layoutJoystick->addWidget(m_LinearSpeedSlider, 0, 4, 3, 1); // spans 3 rows
@@ -283,6 +300,25 @@ SRVjoy::connectToRobot()
                      SLOT(savePlayerPictureShot()));
                m_bHasCamera = true;
                picnum = -1;
+               //these connects might be confusing so..
+               //the check box controls when the thread is running so it is connected to the thread toggle slot
+               //the thread signals to take pictures so it is connected to the take shot slot
+               //the slide bar sets the speed and is displayed in the text edit,
+               //so it is connected to 2 slots, one is in the thread that sets the capture rate
+               //the other is the slot that sets the text edit.
+
+               //connect thread image capture
+               connect(&thread, SIGNAL(threadCallPictureShot()),
+            		   this, SLOT(savePlayerPictureShot()));
+               //connect check box to thread toggle function
+               connect(m_EnableAutoPictureShotCheckBox, SIGNAL(stateChanged(int)),
+                           		   this, SLOT(toggleAutoPictureShotThread()));
+               //connect slider to thread
+               connect(m_AutoPictureShotSlider, SIGNAL(valueChanged(int)), &thread,
+                                    SLOT(setAutoPictureShotRate(int)));
+               //connect slider to text edit
+               connect(m_AutoPictureShotSlider, SIGNAL(valueChanged(int)), this,
+                                                   SLOT(updateAutoCaptureLineEditFromSlider(int)));
             }
          catch (PlayerCc::PlayerError e)
             {
@@ -596,12 +632,6 @@ SRVjoy::savePlayerPictureShot()
 
 }
 
-//public class that calls picture classes (for use by thread)
-//void
-//SRVjoy::callSavePlayerPictureShot(){
-//	savePlayerPictureShot();
-//}
-
 void
 SRVjoy::savedPictureShotHandler()
 {
@@ -631,6 +661,30 @@ SRVjoy::savedPictureShotHandler()
 	}
 }
 
+void
+SRVjoy::toggleAutoPictureShotThread()
+{
+	//the signal that calls this function actually emits an integer
+	//that says if its check or not
+	//but either way its an if-else and this is boolean :D
+	if(m_EnableAutoPictureShotCheckBox->isChecked()){
+		thread.start();
+		std::cout << "checked" << std::endl;
+	}else{
+		std::cout << "unchecked" << std::endl;
+		//this may be unsafe
+		thread.terminate();
+	}
+}
+
+void
+SRVjoy::updateAutoCaptureLineEditFromSlider(int nSpeed)
+{
+	double x = (nSpeed / 100.0);
+	QString tempStr;
+	tempStr.setNum(x,'g',3);
+	m_AutoPictureShotLineEdit->setText(tempStr + " pic/s");
+}
 //^^^^^^^^^^^^^^^^^^^ finish SLOTs ^^^^^^^^^^^^^^^^^^^^^^^
 
 //vvvvvvvvvvvv FINISH Re-implemented Event Handlers vvvvvvvvvvvvvvvvv

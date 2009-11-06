@@ -30,11 +30,12 @@
 #define SRVJOY_H_
 
 #include <QWidget>
-#include "qthread.h"
 #include <libplayerc++/playerc++.h>
 #include "args.h"
 
-//class QCheckBox;
+#include "ImageThread.h"
+
+
 class QLabel;
 class QLineEdit;
 class QPushButton;
@@ -46,7 +47,6 @@ class QVBoxLayout;
 class QGridLayout;
 class QPixmap;
 class QCheckBox;
-//class QString;
 
 // Moving Status Flags:
 const char STOP = 0;
@@ -67,9 +67,6 @@ class SRVjoy : public QWidget
       SRVjoy(QWidget *parent = 0);
 
       bool providesCamera(){return m_bHasCamera;};
-      //public functions for use by thread
-      //void
-      //      callSavePlayerPictureShot();
 
    //signals:
 
@@ -101,6 +98,10 @@ class SRVjoy : public QWidget
       setAngularSpeedInDegreesFromSlider(int dDegrees);
       void
       savePlayerPictureShot();
+      void
+      toggleAutoPictureShotThread();
+      void
+      updateAutoCaptureLineEditFromSlider(int nSpeed);
 
 
    protected:
@@ -136,9 +137,15 @@ class SRVjoy : public QWidget
       QLabel *m_PictureDisplayLabel;
       QPixmap *m_PicturePixmap;
       QCheckBox *m_PictureSaveCheckBox;
+      QCheckBox *m_EnableAutoPictureShotCheckBox;
+      QSlider *m_AutoPictureShotSlider;
+      QLineEdit *m_AutoPictureShotLineEdit;
 
       //integer to keep track of the number of pictures taken
       int picnum;
+
+      //Thread that controls autoPictureShot through signals and slots
+      ImageThread thread; //thread :D
 
       // Player client that represents the robot
       PlayerCc::PlayerClient *m_pRobot;
@@ -163,6 +170,7 @@ class SRVjoy : public QWidget
       static const int m_nMaxTurnRateDegrees = 270; // rad/second
 
       char m_nCurrentMove; // Current moving status of the robot
+
 
       void
       enableButtons(bool enabled);
@@ -189,10 +197,5 @@ class SRVjoy : public QWidget
       void
       savedPictureShotHandler();
 };
-
-//class ImageThread : public QThread{
-//	public:
-//		void run();
-//};
 
 #endif /* SRVJOY_H_ */
