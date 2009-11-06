@@ -7,3 +7,7 @@ qtc-gdbmacros
 doc
 moc*.cpp
 qrc*.cpp
+.project
+.cproject
+Makefile*
+

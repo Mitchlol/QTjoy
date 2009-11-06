@@ -30,6 +30,7 @@
 #define SRVJOY_H_
 
 #include <QWidget>
+#include "qthread.h"
 #include <libplayerc++/playerc++.h>
 #include "args.h"
 
@@ -43,6 +44,8 @@ class QAction;
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
+class QPixmap;
+class QCheckBox;
 //class QString;
 
 // Moving Status Flags:
@@ -64,6 +67,9 @@ class SRVjoy : public QWidget
       SRVjoy(QWidget *parent = 0);
 
       bool providesCamera(){return m_bHasCamera;};
+      //public functions for use by thread
+      //void
+      //      callSavePlayerPictureShot();
 
    //signals:
 
@@ -94,7 +100,8 @@ class SRVjoy : public QWidget
       void
       setAngularSpeedInDegreesFromSlider(int dDegrees);
       void
-      takePictureShot();
+      savePlayerPictureShot();
+
 
    protected:
       void
@@ -125,6 +132,13 @@ class SRVjoy : public QWidget
       QHBoxLayout *layoutConnect;
       QGridLayout *layoutJoystick;
       QVBoxLayout *centralLayout;
+      QHBoxLayout *layoutImageDisplay;
+      QLabel *m_PictureDisplayLabel;
+      QPixmap *m_PicturePixmap;
+      QCheckBox *m_PictureSaveCheckBox;
+
+      //integer to keep track of the number of pictures taken
+      int picnum;
 
       // Player client that represents the robot
       PlayerCc::PlayerClient *m_pRobot;
@@ -141,6 +155,7 @@ class SRVjoy : public QWidget
 
       // Variables to manipulate the robot's Camera interface
       PlayerCc::CameraProxy *m_pCameraProxy;
+      uint8_t *m_pCameraImage;
 
       // define the speed limits for the robot:
       static const double m_dMaxSpeed = 0.5; // m/second
@@ -171,6 +186,13 @@ class SRVjoy : public QWidget
       updateLinearSpeedLineEdit();
       void
       updateAngularSpeedLineEdit();
+      void
+      savedPictureShotHandler();
 };
+
+//class ImageThread : public QThread{
+//	public:
+//		void run();
+//};
 
 #endif /* SRVJOY_H_ */
