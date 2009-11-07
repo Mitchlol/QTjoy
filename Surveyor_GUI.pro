@@ -2,9 +2,11 @@ TEMPLATE = app
 TARGET = SRVjoy
 QT += core \
     gui
-HEADERS += args.h \
+HEADERS += ImageThread.h \
+    args.h \
     SRVjoy.h
-SOURCES += SRVjoy.cpp \
+SOURCES += ImageThread.cpp \
+    SRVjoy.cpp \
     args.cpp \
     main.cpp
 FORMS += 
