@@ -99,6 +99,8 @@ class SRVjoy : public QWidget
       void
       savePlayerPictureShot();
       void
+      videoPlayerPictureShot();
+      void
       toggleAutoPictureShotThread();
       void
       updateAutoCaptureLineEditFromSlider(int nSpeed);
@@ -145,7 +147,7 @@ class SRVjoy : public QWidget
       int picnum;
 
       //Thread that controls autoPictureShot through signals and slots
-      ImageThread thread; //thread :D
+      ImageThread imgThread; //imgThread :D
 
       // Player client that represents the robot
       PlayerCc::PlayerClient *m_pRobot;

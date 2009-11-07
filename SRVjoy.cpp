@@ -332,14 +332,14 @@ SRVjoy::connectToRobot()
                //so it is connected to 2 slots, one is in the thread that sets the capture rate
                //the other is the slot that sets the text edit.
 
-               //connect thread image capture
-               connect(&thread, SIGNAL(threadCallPictureShot()),
-            		   this, SLOT(savePlayerPictureShot()));
-               //connect check box to thread toggle function
+               //connect imgThread image capture
+               connect(&imgThread, SIGNAL(threadCallPictureShot()),
+            		   this, SLOT(videoPlayerPictureShot()));
+               //connect check box to imgThread toggle function
                connect(m_EnableAutoPictureShotCheckBox, SIGNAL(stateChanged(int)),
                            		   this, SLOT(toggleAutoPictureShotThread()));
                //connect slider to thread
-               connect(m_AutoPictureShotSlider, SIGNAL(valueChanged(int)), &thread,
+               connect(m_AutoPictureShotSlider, SIGNAL(valueChanged(int)), &imgThread,
                                     SLOT(setAutoPictureShotRate(int)));
                //connect slider to text edit
                connect(m_AutoPictureShotSlider, SIGNAL(valueChanged(int)), this,
@@ -657,6 +657,38 @@ SRVjoy::savePlayerPictureShot()
       }
 
 }
+void
+SRVjoy::videoPlayerPictureShot()
+{
+   if(providesCamera())
+      {
+         try
+         {
+             // ATTENTION:
+             //         running the Read() command won’t always
+             //         update everything at the same time, so it may take several calls before some
+             //         large data structures (such as a camera image) gets updated.
+            m_pRobot->Read(); // A blocking Read (Only once)
+            //sleep(1); // 1 iddle seconds so new info can get in!
+            //         usleep(1000);
+//            m_pRobot->Read(); // Read again!
+//            m_pCameraProxy->SaveFrame("camera",0);
+            //playerc_camera_save(*m_pCameraProxy, "test");
+//            std::cout << (*m_pCameraProxy) << std::endl;
+            picnum++;
+            //done reading picture
+            savedPictureShotHandler();
+
+         }
+         catch (PlayerCc::PlayerError e)
+         {
+            std::cerr << e << std::endl;
+            m_CameraSnapshotButton->setEnabled(false); // Disable camera button(s)
+//            return;
+         }
+      }
+
+}
 
 void
 SRVjoy::savedPictureShotHandler()
@@ -686,12 +718,12 @@ SRVjoy::toggleAutoPictureShotThread()
 	//that says if its check or not
 	//but either way its an if-else and this is boolean :D
 	if(m_EnableAutoPictureShotCheckBox->isChecked()){
-		thread.start();
+		imgThread.start();
 		std::cout << "checked" << std::endl;
 	}else{
 		std::cout << "unchecked" << std::endl;
 		//this may be unsafe
-		thread.terminate();
+		imgThread.terminate();
 	}
 }
 

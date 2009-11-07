@@ -24,8 +24,8 @@ main(int argc, char *argv[])
 
    SRVjoy joy;
    joy.show();
-   //ImageThread thread;
-   //thread.run(joy);
+   //ImageThread imgThread;
+   //imgThread.run(joy);
 
    return a.exec();
 }
