@@ -27,6 +27,7 @@
  */
 
 #include <QtGui>
+#include <QString>
 
 #include <iostream>
 #include <stdio.h>
@@ -303,6 +304,8 @@ SRVjoy::connectToRobot()
                m_bHasCamera = true;
 
                m_CameraSnapshotButton->setEnabled(true); // Enable camera button(s)
+
+               m_PicturePixmap = new QPixmap;   // Create QPixmap object (without data, yet)
 
                picnum = -1;
             }
@@ -601,7 +604,7 @@ SRVjoy::savePlayerPictureShot()
             //sleep(1); // 1 iddle seconds so new info can get in!
             //         usleep(1000);
             m_pRobot->Read(); // Read again!
-            m_pCameraProxy->SaveFrame("camera",0);
+//            m_pCameraProxy->SaveFrame("camera",0);
             //playerc_camera_save(*m_pCameraProxy, "test");
             std::cout << (*m_pCameraProxy) << std::endl;
             picnum++;
@@ -628,30 +631,22 @@ SRVjoy::savePlayerPictureShot()
 void
 SRVjoy::savedPictureShotHandler()
 {
-	//rename image extension from jpg to pnm so it can be loaded by pixmap
-	//player saves all compressed images as jpg and uncmpressed as ppm
-	//there ahould be a way to get qpixmap->load to specify type as pnm but i cant figure it out
-	//remove # to simplify
+   int imgSizeinBytes = m_pCameraProxy->GetImageSize();
+   uint8_t imgBuffer[imgSizeinBytes]; // Image buffer with the size of the image (# of bytes)
 
-	//get name of current image, and image name we want
-	char imageName[20];
-	sprintf(imageName, "camera%d.jpg", picnum);
-	char newImageName[] ="camera.pnm";
-	//rename current picture
-	rename(imageName , newImageName);
-	//display renamed picture
-	m_PicturePixmap = new QPixmap;
-	if(m_PicturePixmap->load(newImageName)){
-		m_PictureDisplayLabel->setPixmap(*m_PicturePixmap);
-	}
-	//if pictures are supposed to be saved then rename the picture back to its original name
-	//else delete the picture
-	//this wont mess up the QLabel
-	if(m_PictureSaveCheckBox->isChecked()){
-		rename(newImageName, imageName);
-	}else{
-		remove(newImageName);
-	}
+   m_pCameraProxy->GetImage(imgBuffer);
+
+   if(m_PicturePixmap->loadFromData(imgBuffer, imgSizeinBytes))
+      {
+      m_PictureDisplayLabel->setPixmap(*m_PicturePixmap);
+      }
+   if(m_PictureSaveCheckBox->isChecked()){
+
+      char imgNameAsChar[20];
+      sprintf(imgNameAsChar, "camera%d.jpg", picnum);
+      QString imageName = imgNameAsChar;
+      m_PicturePixmap->save(imageName);
+   }
 }
 
 //^^^^^^^^^^^^^^^^^^^ finish SLOTs ^^^^^^^^^^^^^^^^^^^^^^^
